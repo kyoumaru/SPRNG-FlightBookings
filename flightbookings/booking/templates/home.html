@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %} Homepage {% endblock %}
+
+{% block content %}
+<h2>Available Flights</h2>
+
+{% if flights %}
+    <ul>
+        {% for flight in flights %}
+            <li>
+                <strong>{{ flight.origin }} → {{ flight.destination }}</strong> 
+                - ${{ flight.cost }} 
+                - <a href="{% url 'book_flight' flight.id %}">Book Now</a>
+            </li>
+        {% endfor %}
+    </ul>
+{% else %}
+    <p>No flights available.</p>
+{% endif %}
+{% endblock %}
