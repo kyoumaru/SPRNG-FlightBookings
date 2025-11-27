@@ -1,0 +1,21 @@
+{% extends 'base.html' %}
+
+{% block title %}Passenger Details{% endblock %}
+
+{% block content %}
+
+<h2>Passenger Details</h2>
+	<label>Passenger Name:</label>
+	
+	<form method="post">
+		{% csrf_token %}
+		<p><input type="text" name="name" maxlength="100" required></p>
+		<label>Date of Birth:</label>
+		<p><input type="date" name="dob" required></p>
+		<label>Gender:</label>
+		<p><input type="text" name="gender" maxlength="10" required></p>
+		<br>
+		<button type="submit">Confirm Passenger Details</button>
+	</form>
+
+{% endblock %}

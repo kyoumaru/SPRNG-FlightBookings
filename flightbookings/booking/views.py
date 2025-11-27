@@ -128,6 +128,20 @@ def book_flight(request, flight_id):
 def passenger_bookings(request, passenger_id):
     passenger = Passenger.objects.get(id=passenger_id)  
     bookings = Booking.objects.filter(passenger=passenger)
+    
+    if request.method == "POST":
+        name = request.POST.get("name")
+        if name:
+            passenger.name = name
+            
+        dob = request.POST.get("dob")
+        if dob:
+            passenger.birth_date = dob
+            
+        gender = request.POST.get("gender")
+        if gender:
+            passenger.gender = gender
+    
     return render(request, 'passenger_bookings.html', {'passenger': passenger, 'bookings': bookings})
 
 
