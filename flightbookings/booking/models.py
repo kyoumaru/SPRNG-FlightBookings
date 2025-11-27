@@ -9,12 +9,14 @@ class Passenger(models.Model):
         return self.name
 
 class Flight(models.Model):
-    origin = models.CharField(max_length=50)
-    destination = models.CharField(max_length=50)
+    origin = models.CharField(max_length=100)
+    destination = models.CharField(max_length=100)
+    departure = models.DateTimeField()
+    arrival = models.DateTimeField()
     cost = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.origin} → {self.destination}"
+        return f"Flight {self.id}: {self.origin} - {self.destination}"
     
 class Booking(models.Model):
     passenger = models.ForeignKey(Passenger, on_delete=models.CASCADE)
@@ -23,7 +25,7 @@ class Booking(models.Model):
     total_cost = models.DecimalField(max_digits=10, decimal_places=2)
 
     def __str__(self):
-        return f"{self.passenger.name} - {self.flight.origin} → {self.flight.destination}"
+        return f"{self.passenger.name} - {self.flight.origin} - {self.flight.destination}"
 
 class Item(models.Model):
     booking = models.ForeignKey(Booking, on_delete=models.CASCADE, related_name='items')
