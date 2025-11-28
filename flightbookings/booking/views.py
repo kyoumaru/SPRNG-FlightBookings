@@ -132,9 +132,10 @@ def passenger_bookings(request, passenger_id):
     bookings = Booking.objects.filter(passenger=passenger).last()
     
     if request.method == "POST":
-        name = request.POST.get("name")
-        if name:
-            passenger.name = name
+        fname = request.POST.get("fname")
+        lname = request.POST.get("lname")
+        if fname and lname:
+            passenger.name = fname + " " + lname
             
         dob = request.POST.get("dob")
         if dob:

@@ -9,7 +9,9 @@
 		<form method="post">
 		{% csrf_token %}
 			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-				<h3>Passenger Name:</h3><input type="text" name="name" maxlength="100" required>
+				<h3>Passenger Name:</h3>
+					<p>First Name: <input type="text" name="fname" maxlength="100" required> </p>
+					<p>Last Name: <input type="text" name="lname" maxlength="100" required> </p>
 			</section>
 			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
 				<h3>Date of Birth: </h3><input type="date" name="dob" required>
