@@ -12,12 +12,6 @@ def home(request):
     flights = Flight.objects.all()
     return render(request, 'home.html', {'flights': flights})
 
-
-BAGGAGE_COST = Decimal("237")
-TERMINAL_FEE = Decimal("273")
-INSURANCE_COST = Decimal("208")
-
-
 def _get_active_passenger():
     passenger = Passenger.objects.last()
     # Create new passenger if last object in Passenger object set has updated values
@@ -40,6 +34,10 @@ def book_flight(request, flight_id):
         .order_by("-date")
         .first()
     )
+
+    BAGGAGE_COST = Decimal("237")
+    TERMINAL_FEE = Decimal("273")
+    INSURANCE_COST = Decimal("208")
 
     if request.method == "POST":
         baggage_qty = int(request.POST.get("baggage_qty", 0) or 0)
@@ -129,13 +127,13 @@ def book_flight(request, flight_id):
 
 def passenger_bookings(request, passenger_id):
     passenger = Passenger.objects.get(id=passenger_id)  
-    bookings = Booking.objects.filter(passenger=passenger).last()
+    booking = Booking.objects.filter(passenger=passenger).last()  
     
     if request.method == "POST":
         fname = request.POST.get("fname")
         lname = request.POST.get("lname")
         if fname and lname:
-            passenger.name = fname + " " + lname
+            passenger.name = f"{fname} {lname}"
             
         dob = request.POST.get("dob")
         if dob:
@@ -146,10 +144,30 @@ def passenger_bookings(request, passenger_id):
             passenger.gender = gender
             
         passenger.save()
-        
-        return redirect("book_flight", flight_id=bookings.flight.id)
+        return redirect("booking_summary", booking_id=booking.id)
     
-    return render(request, 'passenger_bookings.html', {'passenger': passenger, 'bookings': bookings})
+    return render(request, 'passenger_bookings.html', {'passenger': passenger, 'booking': booking})
 
 
+def booking_summary(request, booking_id):
+    booking = get_object_or_404(Booking, id=booking_id)
+    addons = Item.objects.filter(booking=booking)
 
+    if request.method == "POST":
+        # Finalize booking
+        booking.confirmed = True
+        booking.save()
+
+        # Add a success message
+        messages.success(request, "Thanks for booking with Magis Air!")
+
+        # Redirect to homepage
+        return redirect("home")
+
+    context = {
+        "booking": booking,
+        "flight": booking.flight,
+        "passenger": booking.passenger,
+        "addons": addons,
+    }
+    return render(request, "booking_summary.html", context)

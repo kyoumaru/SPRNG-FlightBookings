@@ -90,21 +90,6 @@
             </button>
         </div>
     </form>
-
-    {% if existing_booking %}
-        <section style="margin-top: 30px; background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
-            <h3>Current Booking</h3>
-            <p><strong>Booked On:</strong> {{ existing_booking.date|date:"F d, Y h:i A" }}</p>
-            <p><strong>Total Paid:</strong> ₱{{ existing_booking.total_cost }}</p>
-            <ul>
-                {% for item in existing_booking.items.all %}
-                    <li>{{ item.description }} — {{ item.quantity }} item(s): ₱{{ item.cost }}</li>
-                {% empty %}
-                    <li>No add-ons recorded.</li>
-                {% endfor %}
-            </ul>
-        </section>
-    {% endif %}
 </div>
 
 <script>
