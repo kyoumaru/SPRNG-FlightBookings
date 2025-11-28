@@ -4,18 +4,22 @@
 
 {% block content %}
 
-<h2>Passenger Details</h2>
-	<label>Passenger Name:</label>
-	
-	<form method="post">
+<div style="max-width: 960px; margin: 0 auto;">
+	<h2>Passenger Details</h2>
+		<form method="post">
 		{% csrf_token %}
-		<p><input type="text" name="name" maxlength="100" required></p>
-		<label>Date of Birth:</label>
-		<p><input type="date" name="dob" required></p>
-		<label>Gender:</label>
-		<p><input type="text" name="gender" maxlength="10" required></p>
-		<br>
-		<button type="submit">Confirm Passenger Details</button>
-	</form>
+			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+				<h3>Passenger Name:</h3><input type="text" name="name" maxlength="100" required>
+			</section>
+			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+				<h3>Date of Birth: </h3><input type="date" name="dob" required>
+			</section>
+			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+				<h3>Gender:</h3><input type="text" name="gender" maxlength="10" required>
+			</section>
+			<br>
+			<button type="submit" style="flex: 1; padding: 12px; border: none; border-radius: 6px; background: #0d47a1; color: white; font-weight: bold;">Confirm Passenger Details</button>
+		</form>
+</div>
 
 {% endblock %}
