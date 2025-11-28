@@ -19,15 +19,17 @@ INSURANCE_COST = Decimal("208")
 
 
 def _get_active_passenger():
-    passenger = Passenger.objects.first()
-    if passenger:
+    passenger = Passenger.objects.last()
+    # Create new passenger if last object in Passenger object set has updated values
+    if passenger.name != "":
+        passenger = Passenger.objects.create(
+            birth_date=date(1111,1,1)
+        )
+        passenger.save()
         return passenger
-
-    return Passenger.objects.create(
-        name="Enzo Galang",
-        gender="Male",
-        birth_date=date(2000, 1, 1),
-    )
+    # If last object in Passenger object set has empty values, return passenger
+    else:
+        return passenger
 
 
 def book_flight(request, flight_id):
