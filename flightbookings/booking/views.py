@@ -1,43 +1,50 @@
 from decimal import Decimal
 from datetime import date
-
 from django.shortcuts import render, get_object_or_404, redirect
 from django.utils import timezone
 from django.contrib import messages
+from .models import Flight, Booking, Passenger, AdditionalItems
 
-from .models import Flight, Booking, Passenger, Item
 
 # Homepage: list all flights
 def home(request):
     flights = Flight.objects.all()
     return render(request, 'home.html', {'flights': flights})
 
+
+
+
 def _get_active_passenger():
     passenger = Passenger.objects.last()
-    # Create new passenger if last object in Passenger object set has updated values
-    if not passenger or passenger.name != "":
+    # If last passenger does not exist, create a new placeholder
+    if not passenger or passenger.first_name != "":
         passenger = Passenger.objects.create(
-            birth_date=date(1111,1,1)
+            first_name="",
+            last_name="",
+            birth_date=date(1111,1,1),
+            gender=""
         )
-        passenger.save()
-        return passenger
-    # If last object in Passenger object set has empty values, return passenger
-    else:
-        return passenger
+    return passenger
+
+
 
 
 def book_flight(request, flight_id):
-    flight = get_object_or_404(Flight, id=flight_id)
+    flight = get_object_or_404(Flight, flight_id=flight_id)
     passenger = _get_active_passenger()
+
+
     existing_booking = (
         Booking.objects.filter(passenger=passenger, flight=flight)
-        .order_by("-date")
+        .order_by("-booking_date")
         .first()
     )
+
 
     BAGGAGE_COST = Decimal("237")
     TERMINAL_FEE = Decimal("273")
     INSURANCE_COST = Decimal("208")
+
 
     if request.method == "POST":
         baggage_qty = int(request.POST.get("baggage_qty", 0) or 0)
@@ -45,34 +52,31 @@ def book_flight(request, flight_id):
         include_insurance = "insurance" in request.POST
     else:
         baggage_qty = 0
-        include_terminal_fee = True  # terminal fee is usually mandatory
+        include_terminal_fee = True
         include_insurance = False
 
-    add_on_breakdown = [{"label": "Flight Fare", "quantity": 1, "cost": flight.cost}]
-    total_cost = flight.cost
+
+    add_on_breakdown = [{"label": "Flight Fare", "quantity": 1, "cost": flight.flight_cost}]
+    total_cost = flight.flight_cost
+
 
     if baggage_qty > 0:
         baggage_cost = BAGGAGE_COST * baggage_qty
         add_on_breakdown.append(
-            {
-                "label": "Additional Baggage",
-                "quantity": baggage_qty,
-                "cost": baggage_cost,
-            }
+            {"label": "Additional Baggage", "quantity": baggage_qty, "cost": baggage_cost}
         )
         total_cost += baggage_cost
 
+
     if include_terminal_fee:
-        add_on_breakdown.append(
-            {"label": "Terminal Fee", "quantity": 1, "cost": TERMINAL_FEE}
-        )
+        add_on_breakdown.append({"label": "Terminal Fee", "quantity": 1, "cost": TERMINAL_FEE})
         total_cost += TERMINAL_FEE
 
+
     if include_insurance:
-        add_on_breakdown.append(
-            {"label": "Travel Insurance", "quantity": 1, "cost": INSURANCE_COST}
-        )
+        add_on_breakdown.append({"label": "Travel Insurance", "quantity": 1, "cost": INSURANCE_COST})
         total_cost += INSURANCE_COST
+
 
     if request.method == "POST":
         booking = Booking.objects.create(
@@ -81,33 +85,37 @@ def book_flight(request, flight_id):
             total_cost=total_cost,
         )
 
+
         if baggage_qty > 0:
-            baggage_total = BAGGAGE_COST * baggage_qty
-            Item.objects.create(
+            AdditionalItems.objects.create(
                 booking=booking,
-                description="Additional Baggage",
+                item_description="Additional Baggage",
                 quantity=baggage_qty,
-                cost=baggage_total,
+                addon_cost=BAGGAGE_COST * baggage_qty,
             )
+
 
         if include_terminal_fee:
-            Item.objects.create(
+            AdditionalItems.objects.create(
                 booking=booking,
-                description="Terminal Fee",
+                item_description="Terminal Fee",
                 quantity=1,
-                cost=TERMINAL_FEE,
+                addon_cost=TERMINAL_FEE,
             )
+
 
         if include_insurance:
-            Item.objects.create(
+            AdditionalItems.objects.create(
                 booking=booking,
-                description="Travel Insurance",
+                item_description="Travel Insurance",
                 quantity=1,
-                cost=INSURANCE_COST,
+                addon_cost=INSURANCE_COST,
             )
 
-        messages.success(request, "Booking finalized successfully.")
-        return redirect("passenger_bookings", passenger_id=passenger.id)
+
+        messages.success(request, "Thanks for booking with Magis Air!")
+        return redirect("passenger_bookings", passenger_id=passenger.passenger_id)
+
 
     context = {
         "flight": flight,
@@ -122,47 +130,53 @@ def book_flight(request, flight_id):
         "terminal_fee": TERMINAL_FEE,
         "insurance_cost": INSURANCE_COST,
     }
-
     return render(request, "booking_form.html", context)
 
+
+
+
 def passenger_bookings(request, passenger_id):
-    passenger = Passenger.objects.get(id=passenger_id)  
-    booking = Booking.objects.filter(passenger=passenger).last()  
-    
+    passenger = get_object_or_404(Passenger, passenger_id=passenger_id)
+    booking = Booking.objects.filter(passenger=passenger).last()
+
+
     if request.method == "POST":
         fname = request.POST.get("fname")
         lname = request.POST.get("lname")
         if fname and lname:
-            passenger.name = f"{fname} {lname}"
-            
+            passenger.first_name = fname
+            passenger.last_name = lname
+
+
         dob = request.POST.get("dob")
         if dob:
             passenger.birth_date = dob
-            
+
+
         gender = request.POST.get("gender")
         if gender:
             passenger.gender = gender
-            
+
+
         passenger.save()
-        return redirect("booking_summary", booking_id=booking.id)
-    
+        return redirect("booking_summary", booking_id=booking.booking_id)
+
+
     return render(request, 'passenger_bookings.html', {'passenger': passenger, 'booking': booking})
 
 
+
+
 def booking_summary(request, booking_id):
-    booking = get_object_or_404(Booking, id=booking_id)
-    addons = Item.objects.filter(booking=booking)
+    booking = get_object_or_404(Booking, booking_id=booking_id)
+    addons = AdditionalItems.objects.filter(booking=booking)
+
 
     if request.method == "POST":
         # Finalize booking
-        booking.confirmed = True
-        booking.save()
-
-        # Add a success message
         messages.success(request, "Thanks for booking with Magis Air!")
-
-        # Redirect to homepage
         return redirect("home")
+
 
     context = {
         "booking": booking,

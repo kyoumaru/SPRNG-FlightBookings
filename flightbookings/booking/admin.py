@@ -1,27 +1,26 @@
 from django.contrib import admin
-from .models import Passenger, Flight, Booking, Item
+from .models import Flight, Passenger, Booking, AdditionalItems
 
-# Register models to appear in admin
-@admin.register(Passenger)
-class PassengerAdmin(admin.ModelAdmin):
-    list_display = ('id', 'name', 'gender', 'birth_date')
-    search_fields = ('name', 'gender')
 
 @admin.register(Flight)
 class FlightAdmin(admin.ModelAdmin):
-    list_display = ('id', 'origin', 'destination', 'cost')
+    list_display = ('flight_id', 'origin', 'destination', 'departure', 'arrival', 'flight_cost')
+    list_filter = ('origin', 'destination')
     search_fields = ('origin', 'destination')
+
+
+@admin.register(Passenger)
+class PassengerAdmin(admin.ModelAdmin):
+    list_display = ('passenger_id', 'first_name', 'last_name', 'gender', 'birth_date')
+    search_fields = ('first_name', 'last_name')
+
 
 @admin.register(Booking)
 class BookingAdmin(admin.ModelAdmin):
-    list_display = ('id', 'passenger', 'flight', 'date', 'total_cost')
-    list_filter = ('date',)
-    search_fields = ('passenger__name', 'flight__origin', 'flight__destination')
-
-@admin.register(Item)
-class ItemAdmin(admin.ModelAdmin):
-    list_display = ('id', 'booking', 'description', 'quantity', 'cost')
-    search_fields = ('description', 'booking__passenger__name', 'booking__flight__origin')
+    list_display = ('booking_id', 'passenger', 'flight', 'booking_date', 'total_cost')
+    list_filter = ('booking_date',)
 
 
-# Register your models here.
+@admin.register(AdditionalItems)
+class AdditionalItemsAdmin(admin.ModelAdmin):
+    list_display = ('item_id', 'booking', 'item_description', 'quantity', 'addon_cost')

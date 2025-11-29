@@ -30,7 +30,7 @@
         <h3>{{ flight.origin }} → {{ flight.destination }}</h3>
         <p><strong>Departure:</strong> {{ flight.departure }}</p>
         <p><strong>Arrival:</strong> {{ flight.arrival }}</p>
-        <p><strong>Flight Cost:</strong> ₱{{ flight.cost }}</p>
+        <p><strong>Flight Cost:</strong> ₱{{ flight.flight_cost }}</p>
         <p><strong>Date Booked:</strong> {{ booking_date|date:"F d, Y" }}</p>
     </section>
 
@@ -101,7 +101,7 @@ document.addEventListener('DOMContentLoaded', function () {
     const totalCell = document.getElementById('total-cost-cell');
     const totalSummary = document.getElementById('total-summary-amount');
 
-    const FLIGHT_COST = parseFloat('{{ flight.cost|floatformat:2 }}');
+    const FLIGHT_COST = parseFloat('{{ flight.flight_cost|floatformat:2 }}');
     const BAGGAGE_COST = parseFloat('{{ baggage_cost|floatformat:2 }}');
     const TERMINAL_FEE = parseFloat('{{ terminal_fee|floatformat:2 }}');
     const INSURANCE_COST = parseFloat('{{ insurance_cost|floatformat:2 }}');

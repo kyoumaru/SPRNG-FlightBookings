@@ -11,7 +11,7 @@
     <!-- Passenger Info -->
     <div style="margin-bottom: 20px;">
         <h3>Passenger Details</h3>
-        <p><strong>Name:</strong> {{ passenger.name }}</p>
+        <p><strong>Name:</strong> {{ passenger.first_name }} {{ passenger.last_name }}</p>
         <p><strong>Gender:</strong> {{ passenger.gender }}</p>
         <p><strong>Birth Date:</strong> {{ passenger.birth_date }}</p>
     </div>
@@ -22,7 +22,7 @@
         <p><strong>Flight:</strong> {{ flight.origin }} → {{ flight.destination }}</p>
         <p><strong>Departure:</strong> {{ flight.departure }}</p>
         <p><strong>Arrival:</strong> {{ flight.arrival }}</p>
-        <p><strong>Cost:</strong> ₱{{ flight.cost }}</p>
+        <p><strong>Cost:</strong> ₱{{ flight.flight_cost }}</p>
     </div>
 
     <!-- Add-ons / Items -->
@@ -31,7 +31,7 @@
         {% if addons %}
             <ul>
                 {% for item in addons %}
-                    <li>{{ item.description }} — {{ item.quantity }} × ₱{{ item.cost }}</li>
+                    <li>{{ item.item_description }} — {{ item.quantity }} × ₱{{ item.addon_cost }}</li>
                 {% endfor %}
             </ul>
         {% else %}
