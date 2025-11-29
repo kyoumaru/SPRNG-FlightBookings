@@ -1,0 +1,165 @@
+{% extends 'base.html' %}
+
+{% block title %}Booking{% endblock %}
+
+{% block content %}
+<style>
+    .flash-message {
+        padding: 10px;
+        border-radius: 6px;
+        margin-bottom: 10px;
+        background: #ffe0e0;
+    }
+    .flash-success { background: #d1f5d3; }
+    .flash-info { background: #e0f0ff; }
+</style>
+<div style="max-width: 960px; margin: 0 auto;">
+    <h2>Flight Booking</h2>
+
+    {% if messages %}
+        <ul style="list-style: none; padding-left: 0;">
+            {% for message in messages %}
+                <li class="flash-message flash-{{ message.tags|default:'info' }}">
+                    {{ message }}
+                </li>
+            {% endfor %}
+        </ul>
+    {% endif %}
+
+    <section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+        <h3>{{ flight.origin }} → {{ flight.destination }}</h3>
+        <p><strong>Departure:</strong> {{ flight.departure }}</p>
+        <p><strong>Arrival:</strong> {{ flight.arrival }}</p>
+        <p><strong>Flight Cost:</strong> ₱{{ flight.flight_cost }}</p>
+        <p><strong>Date Booked:</strong> {{ booking_date|date:"F d, Y" }}</p>
+    </section>
+
+    <form method="post" style="display: flex; flex-direction: column; gap: 20px;">
+        {% csrf_token %}
+        <section style="background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <h3>Add-ons</h3>
+            <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); gap: 15px;">
+                <label style="display: flex; flex-direction: column; gap: 8px;">
+                    <span><strong>Extra Baggage</strong> (₱237 per bag)</span>
+                    <input type="number" name="baggage_qty" min="0" value="{{ baggage_qty }}" style="padding: 8px; border-radius: 6px; border: 1px solid #cfd8dc;">
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" name="terminal_fee" {% if include_terminal_fee %}checked{% endif %}>
+                    <span><strong>Terminal Fee</strong> (+₱273)</span>
+                </label>
+                <label style="display: flex; align-items: center; gap: 10px;">
+                    <input type="checkbox" name="insurance" {% if include_insurance %}checked{% endif %}>
+                    <span><strong>Travel Insurance</strong> (+₱208)</span>
+                </label>
+            </div>
+        </section>
+
+        <section style="background: #fff; border-radius: 10px; padding: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+            <h3>Total Breakdown</h3>
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 2px solid #0d47a1;">
+                        <th style="text-align: left; padding: 8px;">Item</th>
+                        <th style="text-align: center; padding: 8px;">Qty</th>
+                        <th style="text-align: right; padding: 8px;">Cost (₱)</th>
+                    </tr>
+                </thead>
+                <tbody id="breakdown-body">
+                    {% for entry in add_on_breakdown %}
+                    <tr style="border-bottom: 1px solid #e0e0e0;">
+                        <td style="padding: 8px;">{{ entry.label }}</td>
+                        <td style="text-align: center; padding: 8px;">{{ entry.quantity }}</td>
+                        <td style="text-align: right; padding: 8px;">{{ entry.cost }}</td>
+                    </tr>
+                    {% endfor %}
+                    <tr>
+                        <td colspan="2" style="text-align: right; padding: 8px;"><strong>Total</strong></td>
+                        <td id="total-cost-cell" style="text-align: right; padding: 8px;"><strong>₱{{ total_cost }}</strong></td>
+                    </tr>
+                </tbody>
+            </table>
+            <p style="text-align: right; font-size: 18px; margin-top: 15px;">
+                <strong>Grand Total:</strong>
+                <span id="total-summary-amount">₱{{ total_cost }}</span>
+            </p>
+        </section>
+
+        <div style="display: flex; gap: 10px;">
+            <button type="submit" name="action" value="finalize" style="flex: 1; padding: 12px; border: none; border-radius: 6px; background: #0d47a1; color: white; font-weight: bold;">
+                Confirm Booking
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function () {
+    const baggageInput = document.querySelector('input[name="baggage_qty"]');
+    const terminalCheckbox = document.querySelector('input[name="terminal_fee"]');
+    const insuranceCheckbox = document.querySelector('input[name="insurance"]');
+    const breakdownBody = document.getElementById('breakdown-body');
+    const totalCell = document.getElementById('total-cost-cell');
+    const totalSummary = document.getElementById('total-summary-amount');
+
+    const FLIGHT_COST = parseFloat('{{ flight.flight_cost|floatformat:2 }}');
+    const BAGGAGE_COST = parseFloat('{{ baggage_cost|floatformat:2 }}');
+    const TERMINAL_FEE = parseFloat('{{ terminal_fee|floatformat:2 }}');
+    const INSURANCE_COST = parseFloat('{{ insurance_cost|floatformat:2 }}');
+
+    const formatCurrency = (value) => `₱${value.toFixed(2)}`;
+
+    const renderBreakdown = () => {
+        const baggageQty = Math.max(parseInt(baggageInput.value || '0', 10), 0);
+        const includeTerminal = terminalCheckbox.checked;
+        const includeInsurance = insuranceCheckbox.checked;
+
+        const rows = [
+            { label: 'Flight Fare', quantity: 1, cost: FLIGHT_COST },
+        ];
+
+        let total = FLIGHT_COST;
+
+        if (baggageQty > 0) {
+            const baggageTotal = BAGGAGE_COST * baggageQty;
+            rows.push({
+                label: 'Additional Baggage',
+                quantity: baggageQty,
+                cost: baggageTotal,
+            });
+            total += baggageTotal;
+        }
+
+        if (includeTerminal) {
+            rows.push({ label: 'Terminal Fee', quantity: 1, cost: TERMINAL_FEE });
+            total += TERMINAL_FEE;
+        }
+
+        if (includeInsurance) {
+            rows.push({ label: 'Travel Insurance', quantity: 1, cost: INSURANCE_COST });
+            total += INSURANCE_COST;
+        }
+
+        breakdownBody.innerHTML = rows.map((row) => `
+            <tr style="border-bottom: 1px solid #e0e0e0;">
+                <td style="padding: 8px;">${row.label}</td>
+                <td style="text-align: center; padding: 8px;">${row.quantity}</td>
+                <td style="text-align: right; padding: 8px;">${formatCurrency(row.cost)}</td>
+            </tr>
+        `).join('');
+
+        totalCell.innerHTML = `<strong>${formatCurrency(total)}</strong>`;
+        if (totalSummary) {
+            totalSummary.textContent = formatCurrency(total);
+        }
+    };
+
+    [baggageInput, terminalCheckbox, insuranceCheckbox].forEach((el) => {
+        el.addEventListener('input', renderBreakdown);
+        el.addEventListener('change', renderBreakdown);
+    });
+
+    renderBreakdown();
+});
+</script>
+{% endblock %}
+

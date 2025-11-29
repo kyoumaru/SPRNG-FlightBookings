@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>{% block title %}Magis Air{% endblock %}</title>
+    <style>
+        /* Basic Blue & White Theme */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8; /* light blue-ish background */
+            color: #333;
+        }
+
+        header {
+            background-color: #0d47a1; /* dark blue */
+            color: white;
+            padding: 20px;
+            text-align: center;
+        }
+
+        header h1 {
+            margin: 0;
+            font-size: 2.5em;
+        }
+
+        header p {
+            margin: 5px 0 0 0;
+            font-size: 1.1em;
+            font-weight: normal;
+        }
+
+        nav {
+            margin-top: 10px;
+        }
+
+        nav a {
+            color: white;
+            text-decoration: none;
+            margin: 0 15px;
+            font-weight: bold;
+        }
+
+        nav a:hover {
+            text-decoration: underline;
+        }
+
+        main {
+            padding: 20px;
+            padding-bottom: 120px;
+        }
+
+        footer {
+            text-align: center;
+            padding: 15px;
+            background-color: #0d47a1;
+            color: white;
+            position: fixed;
+            width: 100%;
+            bottom: 0;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>Magis Air</h1>
+        <p>Elevate Beyond Limits</p>
+        <nav>
+            <a href="{% url 'home' %}">Home</a>
+            <!-- Add other links later -->
+        </nav>
+    </header>
+
+    <main>
+        {% block content %}
+        <!-- Page-specific content will appear here -->
+        {% endblock %}
+    </main>
+
+    <footer>
+        &copy; Group 19 SPRNG
+    </footer>
+</body>
+
+
+</html

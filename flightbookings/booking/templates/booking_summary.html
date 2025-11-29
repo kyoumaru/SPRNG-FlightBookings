@@ -1,0 +1,58 @@
+{% extends "base.html" %}
+
+{% block title %}Booking Summary - Magis Air{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 600px; margin: 40px auto; background: white; padding: 25px; border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
+
+    <h2 style="text-align:center; margin-top:0;">Booking Summary</h2>
+
+    <!-- Passenger Info -->
+    <div style="margin-bottom: 20px;">
+        <h3>Passenger Details</h3>
+        <p><strong>Name:</strong> {{ passenger.first_name }} {{ passenger.last_name }}</p>
+        <p><strong>Gender:</strong> {{ passenger.gender }}</p>
+        <p><strong>Birth Date:</strong> {{ passenger.birth_date }}</p>
+    </div>
+
+    <!-- Flight Info -->
+    <div style="margin-bottom: 20px;">
+        <h3>Flight Details</h3>
+        <p><strong>Flight:</strong> {{ flight.origin }} → {{ flight.destination }}</p>
+        <p><strong>Departure:</strong> {{ flight.departure }}</p>
+        <p><strong>Arrival:</strong> {{ flight.arrival }}</p>
+        <p><strong>Cost:</strong> ₱{{ flight.flight_cost }}</p>
+    </div>
+
+    <!-- Add-ons / Items -->
+    <div style="margin-bottom: 20px;">
+        <h3>Additional Items</h3>
+        {% if addons %}
+            <ul>
+                {% for item in addons %}
+                    <li>{{ item.item_description }} — {{ item.quantity }} × ₱{{ item.addon_cost }}</li>
+                {% endfor %}
+            </ul>
+        {% else %}
+            <p>No additional items</p>
+        {% endif %}
+    </div>
+
+    <!-- Total Cost -->
+    <div style="margin-bottom: 20px;">
+        <h3>Total Cost: ₱{{ booking.total_cost }}</h3>
+    </div>
+
+    <!-- Confirm Booking Button -->
+    <div style="text-align:center;">
+        <a href="{% url 'home' %}">
+            <button style="padding: 12px 25px; font-size: 16px; background-color: #0d47a1; color:white; border:none; border-radius:8px; cursor:pointer;">
+                Confirm Booking
+            </button>
+        </a>
+    </div>
+
+</div>
+
+{% endblock %}

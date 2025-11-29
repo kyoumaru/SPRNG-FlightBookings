@@ -1,0 +1,30 @@
+{% extends 'base.html' %}
+
+{% block title %} Homepage {% endblock %}
+
+{% block content %}
+
+<h2 style="text-align: center;">Available Flights</h2>
+
+{% if flights %}
+    <div style=" display: flex; flex-wrap: wrap; gap: 20px; justify-content: flex-start; margin: 40px auto; max-width: 1200px; padding: 0 20px; ">
+        {% for flight in flights %}
+
+        <a href="{% url 'book_flight' flight.flight_id %}" style="text-decoration: none; color: inherit;">
+            <div style=" border: 1px solid #0d47a1;  border-radius: 10px; padding: 20px; width: 250px; background: #d6e0e6;transition: 0.2s;" 
+                onmouseover="this.style.transform='scale(1.03)'" onmouseout="this.style.transform='scale(1)'">
+
+                <h3 style="margin-top: 0;">{{ flight.origin }} → {{ flight.destination }}</h3>
+                
+                <p><strong>Departure:</strong> {{ flight.departure }}</p>
+                <p><strong>Arrival:</strong> {{ flight.arrival }}</p>
+                <p><strong>Cost:</strong> ₱{{ flight.flight_cost }}</p>
+            </div>
+        </a>
+        {% endfor %}
+    </div>
+{% else %}
+    <p style="text-align: center;">No available flights right now.</p>
+{% endif %}
+
+{% endblock %}

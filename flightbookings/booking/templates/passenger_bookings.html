@@ -1,0 +1,31 @@
+{% extends 'base.html' %}
+
+{% block title %}Passenger Details{% endblock %}
+
+{% block content %}
+
+<div style="max-width: 960px; margin: 0 auto;">
+	<h2>Passenger Details</h2>
+		<form method="post">
+		{% csrf_token %}
+			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+				<h3>Passenger Name:</h3>
+					<p>First Name: <input type="text" name="fname" maxlength="100" required> </p>
+					<p>Last Name: <input type="text" name="lname" maxlength="100" required> </p>
+			</section>
+			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+				<h3>Date of Birth: </h3><input type="date" name="dob" required>
+			</section>
+			<section style="background: #fff; border-radius: 10px; padding: 20px; margin-bottom: 20px; box-shadow: 0 2px 5px rgba(0,0,0,0.05);">
+				<h3>Gender:</h3><select name="gender" required>
+					<option value="Male">Male</option>
+					<option value="Female">Female</option>
+					<option value="Other">Other</option>
+				</select>
+			</section>
+			<br>
+			<button type="submit" style="flex: 1; padding: 12px; border: none; border-radius: 6px; background: #0d47a1; color: white; font-weight: bold;">Confirm Passenger Details</button>
+		</form>
+</div>
+
+{% endblock %}
