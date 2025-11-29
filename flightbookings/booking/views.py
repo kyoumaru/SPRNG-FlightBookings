@@ -106,7 +106,7 @@ def book_flight(request, flight_id):
                 cost=INSURANCE_COST,
             )
 
-        messages.success(request, "Booking finalized successfully.")
+        messages.success(request, "Thanks for booking with Magis Air")
         return redirect("passenger_bookings", passenger_id=passenger.id)
 
     context = {

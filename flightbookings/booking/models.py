@@ -36,4 +36,3 @@ class Item(models.Model):
     def __str__(self):
         return f"{self.description} x{self.quantity} (${self.cost})"
 
-# Create your models here.
